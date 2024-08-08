@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Agendamentos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <div class="menu-icon">
+            <img src="{{ url_for('static', filename='menu-icon.png') }}" alt="Menu">
+        </div>
+        <div class="logo">
+            <img src="{{ url_for('static', filename='AGENDAMENTOS(1).png') }}" alt="logo">
+        </div>
+        <nav>
+            <a href="{{ url_for('quem_somos_nos') }}">Quem Somos Nós</a>
+            <a href="{{ url_for('planos') }}">Planos</a>
+            <a href="{{ url_for('updates') }}">Updates</a>
+            <a href="{{ url_for('contact') }}">Fale Conosco</a>
+        </nav>
+    </header>
+       
+    <div class="container">
+        <div class="sidebar">
+            <h2>Menu</h2>
+            <ul>
+                <li><a href="{{ url_for('index') }}">Início</a></li>
+                <li><a href="{{ url_for('register_schedule') }}">Registrar Agendamento</a></li>
+                <li><a href="{{ url_for('visual_agendamentos') }}">Visualizar Agendamentos</a></li>
+                <li><a href="{{ url_for('financeiro') }}">Financeiro</a></li>
+                <li><a href="{{ url_for('contact') }}">Fale Conosco</a></li>
+                <li><a href="{{ url_for('restricoes') }}">Restrições</a></li>
+            </ul>
+        </div>
+        
+        <div class="content">
+            <h2>Resumo dos Agendamentos</h2>
+            <div class="chart-container">
+                <canvas id="statusChart"></canvas>
+                <canvas id="regionChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="confirmedChart"></canvas>
+            </div>
+            
+            <h2>Lista de Agendamentos</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Data</th>
+                        <th>Hora</th>
+                        <th>Caminhão</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for schedule in schedules %}
+                    <tr>
+                        <td>{{ schedule.id }}</td>
+                        <td>{{ schedule.date }}</td>
+                        <td>{{ schedule.time }}</td>
+                        <td>{{ schedule.truck }}</td>
+                        <td>{{ schedule.status }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div id="chat-icon">
+        <img src="{{ url_for('static', filename='chat-bubble.png') }}" alt="Chat">
+    </div>
+    
+    <div id="chat-box" style="display: none;">
+        <div id="chat-header">
+            <h3>Chat</h3>
+            <button id="close-chat">X</button>
+        </div>
+        <div id="chat-body"></div>
+        <div id="chat-footer">
+            <input type="text" id="message" placeholder="Digite uma mensagem...">
+            <button id="send">Enviar</button>
+        </div>
+    </div>
+    
+    <div id="page-image">
+        <img src="{{ url_for('static', filename='image.png') }}" alt="Decorative Image">
+    </div>
+    
+    <script src="{{ url_for('static', filename='chatbox.js') }}"></script>
+    <script src="{{ url_for('static', filename='charts.js') }}"></script>
+    <script>
+        // Gráfico de status dos agendamentos
+        const ctxStatus = document.getElementById('statusChart').getContext('2d');
+        const statusChart = new Chart(ctxStatus, {
+            type: 'pie',
+            data: {
+                labels: ['Confirmados', 'Cancelados', 'Em Trânsito'],
+                datasets: [{
+                    label: 'Status dos Agendamentos',
+                    data: [{{ confirmed_percentage }}, {{ canceled_percentage }}, {{ in_transit_percentage }}],
+                    backgroundColor: ['#4CAF50', '#F44336', '#FFC107']
+                }]
+            }
+        });
+
+        // Gráfico de agendamentos por região
+        const ctxRegion = document.getElementById('regionChart').getContext('2d');
+        const regionChart = new Chart(ctxRegion, {
+            type: 'doughnut',
+            data: {
+                labels: ['Norte', 'Sul', 'Leste', 'Oeste'],
+                datasets: [{
+                    label: 'Agendamentos por Região',
+                    data: [/* Valores */],
+                    backgroundColor: ['#2196F3', '#FF5722', '#9C27B0', '#00BCD4']
+                }]
+            }
+        });
+
+        // Gráfico de vagas
+        const ctxVaga = document.getElementById('vagaChart').getContext('2d');
+        const vagaChart = new Chart(ctxVaga, {
+            type: 'bar',
+            data: {
+                labels: ['Vagas em Aberto', 'Em Andamento', 'Finalizados'],
+                datasets: [{
+                    label: 'Status das Vagas',
+                    data: [5, 10, 15],  // Certifique-se de que os dados estão corretos
+                    backgroundColor: ['#FFC107', '#03A9F4', '#8BC34A']
+                 }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Lógica do Chatbox
+        const chatIcon = document.getElementById('chat-icon');
+        const chatBox = document.getElementById('chat-box');
+        const closeChat = document.getElementById('close-chat');
+        const pageImage = document.getElementById('page-image');
+
+        chatIcon.addEventListener('click', () => {
+            chatBox.style.display = 'block';
+        });
+
+        closeChat.addEventListener('click', () => {
+            chatBox.style.display = 'none';
+        });
+
+        pageImage.style.position = 'fixed';
+        pageImage.style.bottom = '0';
+        pageImage.style.right = '0';
+        pageImage.style.width = '200px';  // Ajustar conforme necessário
+    </script>
+</body>
+</html>

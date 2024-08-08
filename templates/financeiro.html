@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financeiro</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='stylesfinanceiro.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Financeiro</h1>
+        <nav>
+            <a href="{{ url_for('index') }}">Início</a>
+            <a href="{{ url_for('logout') }}">Sair</a>
+        </nav>
+    </header>
+
+    <main>
+        <h2>Faturas em Aberto</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Descrição</th>
+                    <th>Valor</th>
+                    <th>Data de Vencimento</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for invoice in invoices %}
+                <tr>
+                    <td>{{ invoice.id }}</td>
+                    <td>{{ invoice.description }}</td>
+                    <td>{{ invoice.amount }}</td>
+                    <td>{{ invoice.due_date }}</td>
+                    <td>{{ invoice.status }}</td>
+                    <td>
+                        <form action="{{ url_for('generate_boleto', id=invoice.id) }}" method="POST">
+                            <button type="submit">Gerar Boleto</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </main>
+</body>
+</html>
